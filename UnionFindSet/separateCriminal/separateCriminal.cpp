@@ -8,7 +8,6 @@
 
 using namespace std;
 
-
 // 关闭罪犯
 struct node{
 	int x, y, num;
@@ -18,7 +17,7 @@ vector<node> arr(100001);
 vector<int> prison(20001, 0);
 vector<int> enemy(20001, 0);
 
-bool equal(const node& a, const node& b)
+bool Equal(const node& a, const node& b)
 {
 	return a.num > b.num;
 }
@@ -59,7 +58,7 @@ void Union(const int x, const int y)
 	if (prison[x] != prison[y])
 	{
 		prison[findHead(x)] = prison[findHead(y)];
-	}
+	}	
 }
 
 /*
@@ -70,7 +69,7 @@ bool isSameSet(const int x, const int y){
 	if (findHead(prison[x]) == findHead(prison[y]))
 	{
 		return true;
-	}
+	}	
 	else
 	{
 		return false;
@@ -81,58 +80,59 @@ bool isSameSet(const int x, const int y){
 void separateCriminal()
 {
 	int crmNum(0), lines(0), i(1);
-	cin >> crmNum >> lines;
+	while(cin >> crmNum >> lines)
+    {
+        for (i = 0; i < lines; i++)
+        {
+            cin >> arr[i].x >> arr[i].y >> arr[i].num;
+        }
 
-	for (i = 0; i < lines; i++)
-	{
-		cin >> arr[i].x >> arr[i].y >> arr[i].num;
-	}
+        // 根据怨气将所有的罪犯对进行降序排序
+        sort(arr.begin(), arr.end(), Equal);
 
-	// 根据怨气将所有的罪犯对进行降序排序
-	sort(arr.begin(), arr.end(), equal);
+        // 初始化监狱集合
+        initSet(crmNum);
 
-	// 初始化监狱集合
-	initSet(crmNum);
+        for (i = 0; i < lines; i++)
+        {
+            // 如果冲突的罪犯已经处在同一集合，则说明无法再分开，输出结果
+            if (isSameSet(arr[i].x, arr[i].y)){
+                cout << arr[i].num; 
+                return;
+            }
 
-	for (i = 0; i < lines; i++)
-	{
-		// 如果冲突的罪犯已经处在同一集合，则说明无法再分开，输出结果
-		if (isSameSet(arr[i].x, arr[i].y)){
-			cout << arr[i].x << " " << arr[i].y << endl;
-			cout << arr[i].num;
-			break;
-		}
-
-		/* 判断敌人集合中是否已经有当前元素 x:
+            /* 判断敌人集合中是否已经有当前元素 x:
 		 * 若x不存在，说明还未存储其敌人，则将以x为下标的数据位上数据更新为x的敌人 y
 		 * 若x存在，说明数组以x为下标的数据位上存在的是x的敌人
 		 * 那么敌人的敌人就是朋友，所以将 x 所对应的敌人 y 与其在敌人集合中的敌人enemy[x]进行聚合
-		*/
-		if (enemy[arr[i].x] != 0)
-		{
-			Union(arr[i].y, enemy[arr[i].x]);
-		}
-		else
-		{
-			enemy[arr[i].x] = arr[i].y;
-		}
+		*/ 
+            if (enemy[arr[i].x] != 0)
+            {
+                Union(arr[i].y, enemy[arr[i].x]);
+            }		
+            else
+            {
+                enemy[arr[i].x] = arr[i].y;		
+            }
 
-		// 对y进行与x相同的操作
-		if (enemy[arr[i].y] != 0)
-		{
-			Union(arr[i].x, enemy[arr[i].y]);
-		}
-		else
-		{
-			enemy[arr[i].y] = arr[i].x;
-		}
-	}
-
+            // 对y进行与x相同的操作
+            if (enemy[arr[i].y] != 0)
+            {
+                Union(arr[i].x, enemy[arr[i].y]);
+            }
+            else
+            {
+                enemy[arr[i].y] = arr[i].x;
+            }
+        }
+        
+        cout << 0 << endl;
+    }
 }
 
 int main()
 {
-	separateCriminal();
-	return 0;
+    separateCriminal();
+    return 0;
 }
 
